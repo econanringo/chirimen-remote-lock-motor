@@ -2,7 +2,7 @@
 import { requestGPIOAccess } from "node-web-gpio";
 import { RelayServer } from "./RelayServer.js";
 
-const CHANNEL_NAME = "chirimenLockMotor";
+const CHANNEL_NAME = "chirimenLockMotor"; // チャンネル名はここ
 const SWITCH_PORT = 5;
 const MOTOR_PORT = 26; // 物理ピン37
 const MOTOR_RUN_MS = 800;

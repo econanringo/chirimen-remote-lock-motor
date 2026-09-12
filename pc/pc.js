@@ -1,6 +1,6 @@
 import { RelayServer } from "https://www.chirimen.org/remote-connection/js/beta/RelayServer.js";
 
-const CHANNEL_NAME = "chirimenLockMotor";
+const CHANNEL_NAME = "chirimenLockMotor"; // チャンネル名はここ
 
 const connectionStatus = document.getElementById("connectionStatus");
 const lockState = document.getElementById("lockState");
