@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CHIRIMEN モーターロック制御</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="header">
+        <p class="eyebrow">CHIRIMEN Remote Lock</p>
+        <h1>モーターロック制御</h1>
+        <p id="connectionStatus" class="status status-wait">接続中...</p>
+      </header>
+
+      <section class="panel lock-panel" aria-labelledby="lockHeading">
+        <h2 id="lockHeading">ロック状態</h2>
+        <p id="lockState" class="lock-badge lock-on">LOCK</p>
+        <p class="hint">解除中だけセンサー入力でモーターが回ります</p>
+        <div class="actions">
+          <button id="unlockButton" type="button">解除</button>
+          <button id="lockButton" type="button" class="secondary">ロック</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="motorHeading">
+        <h2 id="motorHeading">モーター操作</h2>
+        <p class="hint">スマホから直接回します。ロック中でも操作できます</p>
+        <div class="actions">
+          <button id="motorOnButton" type="button">ON</button>
+          <button id="motorOffButton" type="button" class="secondary">OFF</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="deviceHeading">
+        <h2 id="deviceHeading">デバイス状態</h2>
+        <dl class="stats">
+          <div>
+            <dt>センサー</dt>
+            <dd id="sensorState">-</dd>
+          </div>
+          <div>
+            <dt>モーター</dt>
+            <dd id="motorState">-</dd>
+          </div>
+        </dl>
+      </section>
+
+      <p id="messageDiv" class="message">リレーサービスに接続しています</p>
+    </main>
+    <script type="module" src="./pc.js"></script>
+  </body>
+</html>

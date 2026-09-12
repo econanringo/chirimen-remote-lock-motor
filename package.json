@@ -1,0 +1,12 @@
+{
+  "name": "chirimen-remote-lock-motor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare": "curl -sSfLO https://chirimen.org/remote-connection/js/beta/RelayServer.js",
+    "start": "node --experimental-websocket main.js"
+  },
+  "dependencies": {
+    "node-web-gpio": "latest"
+  }
+}
