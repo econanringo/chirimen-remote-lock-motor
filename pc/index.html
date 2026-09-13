@@ -3,33 +3,32 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CHIRIMEN モーターロック制御</title>
+    <title>CHIRIMEN サーボロック制御</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main class="app">
       <header class="header">
         <p class="eyebrow">CHIRIMEN Remote Lock</p>
-        <h1>モーターロック制御</h1>
+        <h1>サーボロック制御</h1>
         <p id="connectionStatus" class="status status-wait">接続中...</p>
       </header>
 
       <section class="panel lock-panel" aria-labelledby="lockHeading">
         <h2 id="lockHeading">ロック状態</h2>
         <p id="lockState" class="lock-badge lock-on">LOCK</p>
-        <p class="hint">解除中だけセンサー入力でモーターが回ります</p>
+        <p class="hint">解除中だけボタン / 照度でサーボが動きます</p>
         <div class="actions">
           <button id="unlockButton" type="button">解除</button>
           <button id="lockButton" type="button" class="secondary">ロック</button>
         </div>
       </section>
 
-      <section class="panel" aria-labelledby="motorHeading">
-        <h2 id="motorHeading">モーター操作</h2>
-        <p class="hint">スマホから直接回します。ロック中でも操作できます</p>
-        <div class="actions">
-          <button id="motorOnButton" type="button">ON</button>
-          <button id="motorOffButton" type="button" class="secondary">OFF</button>
+      <section class="panel" aria-labelledby="servoHeading">
+        <h2 id="servoHeading">サーボ操作</h2>
+        <p class="hint">スマホから直接動かします。ロック中でも操作できます</p>
+        <div class="actions actions-single">
+          <button id="servoRunButton" type="button">サーボを動かす</button>
         </div>
       </section>
 
@@ -41,8 +40,12 @@
             <dd id="sensorState">-</dd>
           </div>
           <div>
-            <dt>モーター</dt>
-            <dd id="motorState">-</dd>
+            <dt>照度</dt>
+            <dd id="luxState">-</dd>
+          </div>
+          <div>
+            <dt>サーボ</dt>
+            <dd id="servoState">-</dd>
           </div>
         </dl>
       </section>

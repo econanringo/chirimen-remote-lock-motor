@@ -4,9 +4,12 @@
   "type": "module",
   "scripts": {
     "prepare": "curl -sSfLO https://chirimen.org/remote-connection/js/beta/RelayServer.js",
-    "start": "node --experimental-websocket main.js"
+    "start": "node --experimental-websocket servo.js"
   },
   "dependencies": {
-    "node-web-gpio": "latest"
+    "node-web-gpio": "latest",
+    "node-web-i2c": "latest",
+    "@chirimen/bh1750": "latest",
+    "@chirimen/pca9685": "latest"
   }
 }

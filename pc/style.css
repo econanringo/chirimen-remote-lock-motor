@@ -112,6 +112,10 @@ dt {
   margin-top: 16px;
 }
 
+.actions-single {
+  grid-template-columns: 1fr;
+}
+
 button {
   min-height: 52px;
   border: 0;

@@ -5,12 +5,12 @@ const CHANNEL_NAME = "chirimenLockMotor"; // チャンネル名はここ
 const connectionStatus = document.getElementById("connectionStatus");
 const lockState = document.getElementById("lockState");
 const sensorState = document.getElementById("sensorState");
-const motorState = document.getElementById("motorState");
+const luxState = document.getElementById("luxState");
+const servoState = document.getElementById("servoState");
 const messageDiv = document.getElementById("messageDiv");
 const unlockButton = document.getElementById("unlockButton");
 const lockButton = document.getElementById("lockButton");
-const motorOnButton = document.getElementById("motorOnButton");
-const motorOffButton = document.getElementById("motorOffButton");
+const servoRunButton = document.getElementById("servoRunButton");
 
 function setMessage(text) {
   messageDiv.textContent = text;
@@ -27,18 +27,19 @@ function renderSensor(state) {
   sensorState.textContent = state;
 }
 
-function renderMotor(data) {
-  motorState.textContent = data.state;
+function renderLux(value) {
+  luxState.textContent = `${value} lx`;
+}
+
+function renderServo(data) {
+  servoState.textContent = data.state;
   if (data.state === "BLOCKED") {
-    setMessage("ロック中のためモーターは動きませんでした");
+    setMessage("ロック中のためサーボは動きませんでした");
     return;
   }
-  if (data.state === "ON") {
-    setMessage("モーターを回しました");
-    return;
-  }
-  if (data.state === "OFF") {
-    setMessage("モーターを止めました");
+  if (data.state === "MOVED") {
+    const kind = data.kind === "ON" ? "起動(ON)" : "停止(OFF)";
+    setMessage(`サーボを動かしました（${kind}）`);
   }
 }
 
@@ -64,8 +65,12 @@ channel.onmessage = ({ data }) => {
     setMessage(`センサーが ${data.state} になりました`);
     return;
   }
-  if (data.type === "motor" && data.state) {
-    renderMotor(data);
+  if (data.type === "lux" && typeof data.value === "number") {
+    renderLux(data.value);
+    return;
+  }
+  if (data.type === "servo" && data.state) {
+    renderServo(data);
   }
 };
 
@@ -75,12 +80,11 @@ function sendLock(state) {
   setMessage(`${state} を送信しました`);
 }
 
-function sendMotor(command) {
-  channel.send({ type: "motor", command });
-  setMessage(`モーター ${command} を送信しました`);
+function sendServoRun() {
+  channel.send({ type: "servo", command: "RUN" });
+  setMessage("サーボを動かすを送信しました");
 }
 
 unlockButton.addEventListener("click", () => sendLock("UNLOCK"));
 lockButton.addEventListener("click", () => sendLock("LOCK"));
-motorOnButton.addEventListener("click", () => sendMotor("ON"));
-motorOffButton.addEventListener("click", () => sendMotor("OFF"));
+servoRunButton.addEventListener("click", sendServoRun);
