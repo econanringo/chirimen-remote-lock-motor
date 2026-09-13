@@ -13,34 +13,82 @@ const lockButton = document.getElementById("lockButton");
 const servoRunButton = document.getElementById("servoRunButton");
 
 function setMessage(text) {
-  messageDiv.textContent = text;
+  if (messageDiv) messageDiv.textContent = text;
+}
+
+function setText(el, text) {
+  if (el) el.textContent = text;
+}
+
+function normalizeData(data) {
+  if (typeof data === "string") {
+    try {
+      return JSON.parse(data);
+    } catch {
+      return null;
+    }
+  }
+  if (data && typeof data === "object") return data;
+  return null;
 }
 
 function renderLock(state) {
+  if (!state) return;
   const unlocked = state === "UNLOCK";
-  lockState.textContent = state;
-  lockState.classList.toggle("lock-off", unlocked);
-  lockState.classList.toggle("lock-on", !unlocked);
+  setText(lockState, state);
+  lockState?.classList.toggle("lock-off", unlocked);
+  lockState?.classList.toggle("lock-on", !unlocked);
 }
 
 function renderSensor(state) {
-  sensorState.textContent = state;
+  if (!state) return;
+  setText(sensorState, state);
 }
 
 function renderLux(value) {
-  luxState.textContent = `${value} lx`;
+  const lux = Number(value);
+  if (Number.isNaN(lux)) return;
+  setText(luxState, `${lux} lx`);
 }
 
-function renderServo(data) {
-  servoState.textContent = data.state;
+function servoLabel(data) {
+  if (!data) return "-";
+  if (data.state === "MOVING") return "動作中";
+  if (data.state === "BLOCKED") return "BLOCKED";
+  if (data.state === "ERROR") return "ERROR";
+  if (data.state === "IDLE") return "待機";
+  if (data.kind === "ON" || data.state === "ON") return "ON";
+  if (data.kind === "OFF" || data.state === "OFF") return "OFF";
+  return data.state || "-";
+}
+
+function renderServo(data, { announce = true } = {}) {
+  setText(servoState, servoLabel(data));
+  if (!announce) return;
+
   if (data.state === "BLOCKED") {
     setMessage("ロック中のためサーボは動きませんでした");
     return;
   }
-  if (data.state === "MOVED") {
-    const kind = data.kind === "ON" ? "起動(ON)" : "停止(OFF)";
+  if (data.state === "MOVING") {
+    setMessage("サーボを動かしています");
+    return;
+  }
+  if (data.state === "ERROR") {
+    setMessage("サーボの駆動に失敗しました");
+    return;
+  }
+  if (data.state === "MOVED" || data.state === "ON" || data.state === "OFF") {
+    const kind = data.kind === "ON" || data.state === "ON" ? "起動(ON)" : "停止(OFF)";
     setMessage(`サーボを動かしました（${kind}）`);
   }
+}
+
+function applyStatus(data) {
+  renderLock(data.lock);
+  renderSensor(data.sensor);
+  if (data.lux != null) renderLux(data.lux);
+  if (data.servo) renderServo(data.servo, { announce: false });
 }
 
 const relay = RelayServer("chirimentest", "chirimenSocket");
@@ -53,24 +101,33 @@ setMessage("web socketリレーサービスに接続しました");
 channel.send({ type: "sync" });
 
 channel.onmessage = ({ data }) => {
-  if (!data || typeof data !== "object") return;
+  try {
+    const payload = normalizeData(data);
+    if (!payload) return;
 
-  if (data.type === "lock") {
-    renderLock(data.state);
-    setMessage(`ロック状態を ${data.state} にしました`);
-    return;
-  }
-  if (data.type === "sensor") {
-    renderSensor(data.state);
-    setMessage(`センサーが ${data.state} になりました`);
-    return;
-  }
-  if (data.type === "lux" && typeof data.value === "number") {
-    renderLux(data.value);
-    return;
-  }
-  if (data.type === "servo" && data.state) {
-    renderServo(data);
+    if (payload.type === "status") {
+      applyStatus(payload);
+      setMessage("デバイス状態を更新しました");
+      return;
+    }
+    if (payload.type === "lock") {
+      renderLock(payload.state);
+      setMessage(`ロック状態を ${payload.state} にしました`);
+      return;
+    }
+    if (payload.type === "sensor") {
+      renderSensor(payload.state);
+      return;
+    }
+    if (payload.type === "lux") {
+      renderLux(payload.value);
+      return;
+    }
+    if (payload.type === "servo" && (payload.state || payload.kind)) {
+      renderServo(payload);
+    }
+  } catch (error) {
+    console.error(error);
   }
 };
 
